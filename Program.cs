@@ -1,18 +1,38 @@
 ﻿using ProtoDisplayDriver.Components;
 using RPiRgbLEDMatrix;
 using SixLabors.ImageSharp;
+using Color = RPiRgbLEDMatrix.Color;
 
-namespace ProtoDisplayDriver;
-
-class Program
+namespace ProtoDisplayDriver
 {
-    static void Main(string[] _)
+    class Program
     {
-        using var matrix = new RGBLedMatrix(32, 2, 1);
-        var virtualCanvas = new VirtualCanvas(matrix);
-        var eyeNode = new Node(new PointF(0f, 0), "./res/EyeSharp.png");
-        eyeNode.AddComponent(new Wiggler(0, 0.005f, 0, 0.2f));
-        virtualCanvas.AddNode(eyeNode);
-        virtualCanvas.Loop();
+        static void Main(string[] _)
+        {
+            using var matrix = new RGBLedMatrix(32, 2, 1);
+
+            var virtualCanvas = new World(matrix);
+            var eyeNode = new Node(new PointF(2f, 2f));
+            eyeNode.AddComponent(new ImageRenderer("./res/EyeSharp.png"));
+            eyeNode.AddComponent(new Wiggler(0, 0.05f, 0, 50));
+            virtualCanvas.AddNode(eyeNode);
+            virtualCanvas.Loop();
+        }
+    }
+}
+
+namespace ExtensionMethods
+{
+    public static class Extensions
+    {
+        public static Color Multiply(this Color a, float factor)
+        {
+            return new Color
+            {
+                R = (byte)(a.R * factor),
+                G = (byte)(a.G * factor),
+                B = (byte)(a.B * factor)
+            };
+        }
     }
 }
