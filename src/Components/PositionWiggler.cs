@@ -4,7 +4,8 @@ namespace ProtoDisplayDriver.Components;
 
 public class PositionWiggler : Wiggler
 {
-    public PositionWiggler(Vector2 speed, Vector2 seed, Vector2 magnitude, Vector2 offset) : base(speed, seed, magnitude, offset)
+    public PositionWiggler(Vector2 speed, Vector2 magnitude, Vector2? offset = null, Vector2? seed = null) : base(speed, seed ?? new Vector2(0.2f, 0.7f), magnitude,
+        offset ?? Vector2.Zero)
     {
     }
 
