@@ -14,8 +14,8 @@ namespace ProtoDisplayDriver
             var virtualCanvas = new World(matrix);
             var eyeNode = new Node(new Vector2(4f, 1f), rotation: new Vector3(0, 0, 0.1f));
             eyeNode.AddComponent(new Wiggler(0, 0.03f, 0, 50));
-            eyeNode.AddComponent(new Rotator(new Vector3(0.1f, 0, 0)));
             eyeNode.AddComponent(new ImageRenderer("./res/EyeSharp.png"));
+            eyeNode.AddComponent(new Scaler(new Vector2(1, 0.1f), new Vector2(1f, 1f), new Vector2(1, 0.1f)));
             virtualCanvas.AddNode(eyeNode);
 
             var mouthNode = new Node(new Vector2(25, 21f));

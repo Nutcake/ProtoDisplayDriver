@@ -6,13 +6,15 @@ public class Node
 {
     public Vector2 Position { get; set; }
     public Vector3 Rotation { get; set; }
+    public Vector2 Scale { get; set; }
 
     private readonly List<Component> _components = new();
 
-    public Node(Vector2? position=null, Vector3? rotation=null)
+    public Node(Vector2? position=null, Vector3? rotation=null, Vector2? scale=null)
     {
         Position = position ?? new Vector2();
         Rotation = rotation ?? new Vector3();
+        Scale = scale ?? new Vector2(1, 1);
     }
 
     public void AddComponent(Component component)

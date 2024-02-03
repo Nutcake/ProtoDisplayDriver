@@ -30,7 +30,7 @@ public class ImageRenderer : Component
                 var pixel = _image[imgX, imgY];
                 if (pixel.A < 1) continue;
 
-                var (tfX, tfY) = Vector2.Transform(new Vector2(imgX - pivot.X, imgY - pivot.Y), mat);
+                var (tfX, tfY) = Vector2.Transform(new Vector2(imgX - pivot.X, imgY - pivot.Y), mat) * node.Scale;
                 var xFloor = (int)float.Floor(tfX);
                 var xCeil = (int)float.Ceiling(tfX);
                 var yFloor = (int)float.Floor(tfY);
