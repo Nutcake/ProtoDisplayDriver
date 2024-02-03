@@ -21,8 +21,8 @@ public class Panner : Component
     public override void Update(Node node, float delta)
     {
         var oldPos = node.Position;
-        var newY = oldPos.Y + MathF.Sin((_frame/1000f) * _yFrequency) * _yAmplitude;
-        var newX = oldPos.X + MathF.Sin((_frame/1000f) * _xFrequency) * _xAmplitude;
+        var newY = oldPos.Y + MathF.Sin(_frame / 1000f * _yFrequency) * _yAmplitude;
+        var newX = oldPos.X + MathF.Sin(_frame / 1000f * _xFrequency) * _xAmplitude;
         node.Position = new Vector2(newX, newY);
         _frame++;
     }

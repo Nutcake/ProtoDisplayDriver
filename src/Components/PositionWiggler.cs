@@ -14,7 +14,7 @@ public class PositionWiggler : Wiggler
         node.Position = new Vector2
         {
             X = wiggle.X,
-            Y = wiggle.Y,
+            Y = wiggle.Y
         };
     }
 }

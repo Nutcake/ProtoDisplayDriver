@@ -15,15 +15,23 @@ namespace ProtoDisplayDriver
             var virtualCanvas = new World(matrix);
 
             var blinkTimer = new Timer(2000);
-
-            var eyeNode = new Node(rotation: new Vector3(0, 0, 0.1f));
-            eyeNode.AddComponent(
+            
+            var faceHolder = new Node();
+            faceHolder.AddComponent(
                 new PositionWiggler(
                     new Vector2(2f, 2f),
                     new Vector2((float)random.NextDouble(), (float)random.NextDouble()),
                     new Vector2(1.5f, 1.5f),
-                    new Vector2(2f, 3f)
+                    new Vector2(31, 15)
                 ));
+            faceHolder.AddComponent(new ScaleWiggler(
+                new Vector2(2f, 2f),
+                new Vector2((float)random.NextDouble(), (float)random.NextDouble()),
+                new Vector2(0.05f, 0.05f),
+                new Vector2(1f, 1f)
+            ));
+            
+            var eyeNode = new Node(position: new Vector2(-31, -15), new Vector3(0, 0, 0.1f));
             var eyeRenderer = new AnimatedImageRenderer("./res/EyeFrames/", speed: 3f, pingPong: true);
             eyeNode.AddComponent(eyeRenderer);
             eyeRenderer.PlaybackFinished += () =>
@@ -34,19 +42,18 @@ namespace ProtoDisplayDriver
             blinkTimer.Elapsed += (_, _) => eyeRenderer.PlayOneshot();
             blinkTimer.AutoReset = false;
             blinkTimer.Enabled = true;
-            
-            eyeNode.AddComponent(new ScaleWiggler(
-                new Vector2(2f, 2f),
-                new Vector2((float)random.NextDouble(), (float)random.NextDouble()),
-                new Vector2(0.05f, 0.05f),
-                new Vector2(1f, 1f)
-                ));
 
-            virtualCanvas.AddNode(eyeNode);
-
-            var mouthNode = new Node(new Vector2(26, 22f));
+            var mouthNode = new Node(new Vector2(-5, 7f));
             mouthNode.AddComponent(new ImageRenderer("./res/Mouth.png"));
+            
+            faceHolder.AddChild(eyeNode);
+            faceHolder.AddChild(mouthNode);
+                        
+            virtualCanvas.AddNode(faceHolder);
+            virtualCanvas.AddNode(eyeNode);
             virtualCanvas.AddNode(mouthNode);
+            Console.WriteLine(eyeNode.GlobalPosition);
+            Console.WriteLine(mouthNode.GlobalPosition);
             virtualCanvas.Loop();
         }
     }

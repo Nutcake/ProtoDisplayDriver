@@ -21,8 +21,8 @@ public class ImageRenderer : Component
     public override void Draw(Node node, float[,] canvas, int width, int height, float delta)
     {
         var pivot = new PointF(_image.Width / 2f, _image.Height / 2f);
-        var mat = Matrix.CreateFromYawPitchRoll(node.Rotation.X, node.Rotation.Y, node.Rotation.Z);
-        mat.Translation = new Vector3(node.Position.X + pivot.X, node.Position.Y + pivot.Y, 0);
+        var mat = Matrix.CreateFromYawPitchRoll(node.GlobalRotation.X, node.GlobalRotation.Y, node.GlobalRotation.Z);
+        mat.Translation = new Vector3(node.GlobalPosition.X + pivot.X, node.GlobalPosition.Y + pivot.Y, 0);
         for (var imgY = 0; imgY < _image.Height; imgY++)
         {
             for (var imgX = 0; imgX < _image.Width; imgX++)
@@ -30,7 +30,7 @@ public class ImageRenderer : Component
                 var pixel = _image[imgX, imgY];
                 if (pixel.A < 1) continue;
 
-                var (tfX, tfY) = Vector2.Transform(new Vector2(imgX - pivot.X, imgY - pivot.Y), mat) * node.Scale;
+                var (tfX, tfY) = Vector2.Transform(new Vector2(imgX - pivot.X, imgY - pivot.Y), mat) * node.GlobalScale;
                 var xFloor = (int)float.Floor(tfX);
                 var xCeil = (int)float.Ceiling(tfX);
                 var yFloor = (int)float.Floor(tfY);
