@@ -8,10 +8,6 @@ public class GaussianFilter : Component
         { 0.1250f, 0.250f, 0.1250f },
         { 0.0625f, 0.125f, 0.0625f },
     };
-
-    public override void Update(Node node, float delta)
-    {
-    }
     
     public override void Draw(Node node, float[,] canvas, int width, int height, float delta)
     {

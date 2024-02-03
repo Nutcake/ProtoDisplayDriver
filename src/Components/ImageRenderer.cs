@@ -1,32 +1,28 @@
-﻿using SixLabors.ImageSharp;
+﻿using Microsoft.Xna.Framework;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Color = RPiRgbLEDMatrix.Color;
 
 namespace ProtoDisplayDriver.Components;
 
 public class ImageRenderer : Component
 {
     private Image<Rgba32> _image;
-    private float _rotation;
 
-    public ImageRenderer(Image<Rgba32> image, float rotation)
+    public ImageRenderer(Image<Rgba32> image)
     {
         _image = image;
-        _rotation = rotation;
     }
 
-    public ImageRenderer(string path, float rotation=0, Color? color = null) : this(Image.Load<Rgba32>(path), rotation)
-    {
-    }
-
-
-    public override void Update(Node node, float delta)
+    public ImageRenderer(string path) : this(Image.Load<Rgba32>(path))
     {
     }
 
 
     public override void Draw(Node node, float[,] canvas, int width, int height, float delta)
     {
+        var pivot = new PointF(_image.Width / 2f, _image.Height / 2f);
+        var mat = Matrix.CreateFromYawPitchRoll(node.Rotation.X, node.Rotation.Y, node.Rotation.Z);
+        mat.Translation = new Vector3(node.Position.X + pivot.X, node.Position.Y + pivot.Y, 0);
         for (var imgY = 0; imgY < _image.Height; imgY++)
         {
             for (var imgX = 0; imgX < _image.Width; imgX++)
@@ -34,8 +30,7 @@ public class ImageRenderer : Component
                 var pixel = _image[imgX, imgY];
                 if (pixel.A < 1) continue;
 
-                var (tfX, tfY) = _rotatePoint(new PointF(imgX + node.Position.X, imgY + node.Position.Y));
-
+                var (tfX, tfY) = Vector2.Transform(new Vector2(imgX - pivot.X, imgY - pivot.Y), mat);
                 var xFloor = (int)float.Floor(tfX);
                 var xCeil = (int)float.Ceiling(tfX);
                 var yFloor = (int)float.Floor(tfY);
@@ -60,13 +55,5 @@ public class ImageRenderer : Component
                 canvas[xFloor, yCeil] = fc;
             }
         }
-    }
-
-    private PointF _rotatePoint(PointF point)
-    {
-        return new PointF(
-            MathF.Cos(_rotation) * point.X - MathF.Sin(_rotation) * point.Y,
-            MathF.Sin(_rotation) * point.X + MathF.Cos(_rotation) * point.Y
-        );
     }
 }

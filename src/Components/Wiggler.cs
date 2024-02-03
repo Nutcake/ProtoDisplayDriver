@@ -1,4 +1,4 @@
-﻿using SixLabors.ImageSharp;
+﻿using Microsoft.Xna.Framework;
 
 namespace ProtoDisplayDriver.Components;
 
@@ -23,11 +23,13 @@ public class Wiggler : Component
         var oldPos = node.Position;
         var newY = oldPos.Y + MathF.Sin((_frame/1000f) * _yFrequency) * _yAmplitude;
         var newX = oldPos.X + MathF.Sin((_frame/1000f) * _xFrequency) * _xAmplitude;
-        node.Position = new PointF(newX, newY);
+        node.Position = new Vector2(newX, newY);
         _frame++;
     }
-
-    public override void Draw(Node node, float[,] canvas, int width, int height, float delta)
+    
+    public static float PingPong(float val, float length)
     {
+        return MathF.Abs((float) ((val + (double) length) % (length * 2.0)) - length);
     }
+
 }

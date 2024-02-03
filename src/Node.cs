@@ -1,25 +1,18 @@
-﻿using ExtensionMethods;
-using RPiRgbLEDMatrix;
-using SixLabors.ImageSharp;
-using Color = RPiRgbLEDMatrix.Color;
+﻿using Microsoft.Xna.Framework;
 
 namespace ProtoDisplayDriver;
 
 public class Node
 {
-    private PointF _position;
-
-    public PointF Position
-    {
-        get => _position;
-        set => _position = value;
-    }
+    public Vector2 Position { get; set; }
+    public Vector3 Rotation { get; set; }
 
     private readonly List<Component> _components = new();
 
-    public Node(PointF position)
+    public Node(Vector2? position=null, Vector3? rotation=null)
     {
-        _position = position;
+        Position = position ?? new Vector2();
+        Rotation = rotation ?? new Vector3();
     }
 
     public void AddComponent(Component component)
