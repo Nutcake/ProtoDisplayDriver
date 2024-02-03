@@ -1,5 +1,4 @@
-﻿using RPiRgbLEDMatrix;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 
 namespace ProtoDisplayDriver.Components;
 
@@ -28,7 +27,7 @@ public class Wiggler : Component
         _frame++;
     }
 
-    public override void Draw(Node node, RGBLedCanvas canvas, float delta)
+    public override void Draw(Node node, float[,] canvas, int width, int height, float delta)
     {
     }
 }

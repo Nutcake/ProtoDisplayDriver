@@ -1,5 +1,7 @@
-﻿using RPiRgbLEDMatrix;
+﻿using ExtensionMethods;
+using RPiRgbLEDMatrix;
 using SixLabors.ImageSharp;
+using Color = RPiRgbLEDMatrix.Color;
 
 namespace ProtoDisplayDriver;
 
@@ -13,8 +15,7 @@ public class Node
         set => _position = value;
     }
 
-    private float _rotation;
-    private HashSet<Component> _components = new();
+    private readonly List<Component> _components = new();
 
     public Node(PointF position)
     {
@@ -26,11 +27,11 @@ public class Node
         _components.Add(component);
     }
 
-    public void Draw(RGBLedCanvas canvas, float delta)
+    public void Draw(float[,] canvas, int width, int height, float delta)
     {
         foreach (var component in _components)
         {
-            component.Draw(this, canvas, delta);
+            component.Draw(this, canvas, width, height, delta);
         }
     }
 

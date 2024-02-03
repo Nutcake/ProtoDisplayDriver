@@ -1,6 +1,4 @@
-﻿using ExtensionMethods;
-using RPiRgbLEDMatrix;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Color = RPiRgbLEDMatrix.Color;
 
@@ -9,15 +7,15 @@ namespace ProtoDisplayDriver.Components;
 public class ImageRenderer : Component
 {
     private Image<Rgba32> _image;
-    private Color _color;
+    private float _rotation;
 
-    public ImageRenderer(Image<Rgba32> image, Color? color = null)
+    public ImageRenderer(Image<Rgba32> image, float rotation)
     {
-        _color = color ?? new Color(255, 100, 0);
         _image = image;
+        _rotation = rotation;
     }
 
-    public ImageRenderer(string path, Color? color = null) : this(Image.Load<Rgba32>(path), color)
+    public ImageRenderer(string path, float rotation=0, Color? color = null) : this(Image.Load<Rgba32>(path), rotation)
     {
     }
 
@@ -27,10 +25,8 @@ public class ImageRenderer : Component
     }
 
 
-    public override void Draw(Node node, RGBLedCanvas canvas, float delta)
+    public override void Draw(Node node, float[,] canvas, int width, int height, float delta)
     {
-        var values = new float[canvas.Width, canvas.Height];
-
         for (var imgY = 0; imgY < _image.Height; imgY++)
         {
             for (var imgX = 0; imgX < _image.Width; imgX++)
@@ -38,43 +34,39 @@ public class ImageRenderer : Component
                 var pixel = _image[imgX, imgY];
                 if (pixel.A < 1) continue;
 
-                var xFloor = (int)float.Floor(imgX + node.Position.X);
-                var xCeil = (int)float.Ceiling(imgX + node.Position.X);
-                var yFloor = (int)float.Floor(imgY + node.Position.Y);
-                var yCeil = (int)float.Ceiling(imgY + node.Position.Y);
-                if (xFloor < 0 || xFloor >= canvas.Width ||
-                    xCeil < 0 || xCeil >= canvas.Width ||
-                    yFloor < 0 || yFloor >= canvas.Height ||
-                    yCeil < 0 || yCeil >= canvas.Height) continue;
+                var (tfX, tfY) = _rotatePoint(new PointF(imgX + node.Position.X, imgY + node.Position.Y));
 
-                var deltaXLow = 1 - (imgX + node.Position.X - xFloor);
-                var deltaYLow = 1 - (imgY + node.Position.Y - yFloor);
-                var deltaXHigh = 1 - (xCeil - (imgX + node.Position.X));
-                var deltaYHigh = 1 - (yCeil - (imgY + node.Position.Y));
+                var xFloor = (int)float.Floor(tfX);
+                var xCeil = (int)float.Ceiling(tfX);
+                var yFloor = (int)float.Floor(tfY);
+                var yCeil = (int)float.Ceiling(tfY);
+                if (xFloor < 0 || xFloor >= width ||
+                    xCeil < 0 || xCeil >= width ||
+                    yFloor < 0 || yFloor >= height ||
+                    yCeil < 0 || yCeil >= height) continue;
 
-                var ff = float.Clamp(values[xFloor, yFloor] + (deltaXLow + deltaYLow) / 4, 0, 1);
-                values[xFloor, yFloor] = ff;
-                var cf = float.Clamp(values[xCeil, yFloor] + (deltaXHigh + deltaYLow) / 4, 0, 1);
-                values[xCeil, yFloor] = cf;
-                var cc = float.Clamp(values[xCeil, yCeil] + (deltaXHigh + deltaYHigh) / 4, 0, 1);
-                values[xCeil, yCeil] = cc;
-                var fc = float.Clamp(values[xFloor, yCeil] + (deltaXLow + deltaYHigh) / 4, 0, 1);
-                values[xFloor, yCeil] = fc;
+                var deltaXLow = 1 - (tfX - xFloor);
+                var deltaYLow = 1 - (tfY - yFloor);
+                var deltaXHigh = 1 - (xCeil - tfX);
+                var deltaYHigh = 1 - (yCeil - tfY);
+
+                var ff = float.Clamp(canvas[xFloor, yFloor] + (deltaXLow + deltaYLow) / 4, 0, 1);
+                canvas[xFloor, yFloor] = ff;
+                var cf = float.Clamp(canvas[xCeil, yFloor] + (deltaXHigh + deltaYLow) / 4, 0, 1);
+                canvas[xCeil, yFloor] = cf;
+                var cc = float.Clamp(canvas[xCeil, yCeil] + (deltaXHigh + deltaYHigh) / 4, 0, 1);
+                canvas[xCeil, yCeil] = cc;
+                var fc = float.Clamp(canvas[xFloor, yCeil] + (deltaXLow + deltaYHigh) / 4, 0, 1);
+                canvas[xFloor, yCeil] = fc;
             }
         }
+    }
 
-        var colors = new Color[values.Length];
-        var index = 0;
-        for (int y = 0; y < canvas.Height; y++)
-        {
-            for (int x = 0; x < canvas.Width; x++)
-            {
-                colors[index] = _color.Multiply(values[x, y]);
-                index++;
-            }
-        }
-
-        canvas.SetPixels(0, 0, canvas.Width, canvas.Height, colors);
-
+    private PointF _rotatePoint(PointF point)
+    {
+        return new PointF(
+            MathF.Cos(_rotation) * point.X - MathF.Sin(_rotation) * point.Y,
+            MathF.Sin(_rotation) * point.X + MathF.Cos(_rotation) * point.Y
+        );
     }
 }
