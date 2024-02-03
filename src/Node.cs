@@ -12,8 +12,6 @@ public class Node
 
     private readonly HashSet<Node> _children = new ();
 
-    public HashSet<Node> Children => new (_children);
-
     public Vector2 GlobalPosition => (Parent?.GlobalPosition ?? Vector2.Zero) + Position;
     public Vector2 GlobalScale => (Parent?.GlobalScale ?? Vector2.One) * Scale;
     public Vector3 GlobalRotation => (Parent?.GlobalRotation ?? Vector3.Zero) + Rotation;
@@ -49,6 +47,11 @@ public class Node
         {
             component.Draw(this, canvas, width, height, delta);
         }
+
+        foreach (var child in _children)
+        {
+            child.Draw(canvas, width, height, delta);
+        }
     }
 
     public void Update(float delta)
@@ -56,6 +59,11 @@ public class Node
         foreach (var component in _components)
         {
             component.Update(this, delta);
+        }
+
+        foreach (var child in _children)
+        {
+            child.Update(delta);
         }
     }
 }
