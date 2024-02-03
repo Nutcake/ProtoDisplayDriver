@@ -11,6 +11,6 @@ public class RotationWiggler : Wiggler
 
     public override void Update(Node node, float delta)
     {
-        
+        node.Rotation = Wiggle();
     }
 }
