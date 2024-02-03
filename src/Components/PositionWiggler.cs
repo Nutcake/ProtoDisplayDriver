@@ -9,10 +9,10 @@ public class PositionWiggler : Wiggler
     {
     }
 
-    public override void Update(Node node, float delta)
+    public override void Update(float delta)
     {
         var wiggle =  Wiggle();
-        node.Position = new Vector2
+        Node.Position = new Vector2
         {
             X = wiggle.X,
             Y = wiggle.Y

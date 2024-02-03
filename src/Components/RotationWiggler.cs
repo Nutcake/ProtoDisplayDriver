@@ -9,8 +9,8 @@ public class RotationWiggler : Wiggler
     {
     }
 
-    public override void Update(Node node, float delta)
+    public override void Update(float delta)
     {
-        node.Rotation = Wiggle();
+        Node.Rotation = Wiggle();
     }
 }

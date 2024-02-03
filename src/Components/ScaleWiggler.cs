@@ -9,10 +9,10 @@ public class ScaleWiggler : Wiggler
     {
     }
 
-    public override void Update(Node node, float delta)
+    public override void Update(float delta)
     {
         var wiggle = Wiggle();
-        node.Scale = new Vector2
+        Node.Scale = new Vector2
         {
             X = wiggle.X,
             Y = wiggle.Y

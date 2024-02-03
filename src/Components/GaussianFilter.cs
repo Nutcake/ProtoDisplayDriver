@@ -9,7 +9,7 @@ public class GaussianFilter : Component
         { 0.0625f, 0.125f, 0.0625f },
     };
     
-    public override void Draw(Node node, float[,] canvas, int width, int height, float delta)
+    public override void Draw(float[,] canvas, int width, int height, float delta)
     {
         var target = new float[width, height];
         for (var y = 0; y < height; y++)

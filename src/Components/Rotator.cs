@@ -11,8 +11,8 @@ public class Rotator : Component
         _speed = speed;
     }
 
-    public override void Update(Node node, float delta)
+    public override void Update(float delta)
     {
-        node.Rotation = node.Rotation + _speed;
+        Node.Rotation = Node.Rotation + _speed;
     }
 }

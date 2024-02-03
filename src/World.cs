@@ -11,6 +11,7 @@ class World
     private RGBLedMatrix _matrix;
     private long _lastElapsed;
     private readonly Node _rootNode = new();
+    private Action? _updateRun;
 
     public World(RGBLedMatrix matrix)
     {
@@ -18,8 +19,20 @@ class World
         _matrix = matrix;
     }
 
+    public void ScheduleExecuteNextUpdate(Action runnable)
+    {
+        Action? wrappedRunnable = null;
+        wrappedRunnable = () =>
+        {
+            runnable.Invoke();
+            _updateRun -= wrappedRunnable;
+        };
+        _updateRun += wrappedRunnable;
+    }
+    
     private void Update(float delta)
     {
+        _updateRun?.Invoke();
         _rootNode.Update(delta);
     }
 

@@ -10,7 +10,7 @@ public class Node
 
     public Node? Parent { get; set; }
 
-    private readonly HashSet<Node> _children = new ();
+    private readonly HashSet<Node> _children = new();
 
     public Vector2 GlobalPosition => (Parent?.GlobalPosition ?? Vector2.Zero) + Position;
     public Vector2 GlobalScale => (Parent?.GlobalScale ?? Vector2.One) * Scale;
@@ -18,7 +18,7 @@ public class Node
 
     private readonly List<Component> _components = new();
 
-    public Node(Vector2? position=null, Vector3? rotation=null, Vector2? scale=null)
+    public Node(Vector2? position = null, Vector3? rotation = null, Vector2? scale = null)
     {
         Position = position ?? new Vector2();
         Rotation = rotation ?? new Vector3();
@@ -36,8 +36,23 @@ public class Node
         _children.Add(node);
     }
 
+    public void RemoveChild(Node node)
+    {
+        _children.Remove(node);
+        node.Parent = null;
+    }
+
+    public void RemoveAllChildren()
+    {
+        foreach (var child in _children)
+        {
+            RemoveChild(child);
+        }
+    }
+
     public void AddComponent(Component component)
     {
+        component.Node = this;
         _components.Add(component);
     }
 
@@ -45,7 +60,7 @@ public class Node
     {
         foreach (var component in _components)
         {
-            component.Draw(this, canvas, width, height, delta);
+            component.Draw(canvas, width, height, delta);
         }
 
         foreach (var child in _children)
@@ -58,7 +73,7 @@ public class Node
     {
         foreach (var component in _components)
         {
-            component.Update(this, delta);
+            component.Update(delta);
         }
 
         foreach (var child in _children)
