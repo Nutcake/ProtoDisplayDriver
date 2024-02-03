@@ -2,34 +2,37 @@
 
 namespace ProtoDisplayDriver.Components;
 
-public class Wiggler : Component
+public abstract class Wiggler : Component
 {
-    private float _xAmplitude;
-    private float _yAmplitude;
-    private float _xFrequency;
-    private float _yFrequency;
-    private long _frame;
+    public Vector3 Speed;
+    public Vector3 Seed;
+    public Vector3 Magnitude;
+    public Vector3 Offset;
 
-    public Wiggler(float xAmplitude, float yAmplitude, float xFrequency, float yFrequency)
+    protected Wiggler(Vector3 speed, Vector3 seed, Vector3 magnitude, Vector3 offset)
     {
-        _xAmplitude = xAmplitude;
-        _yAmplitude = yAmplitude;
-        _xFrequency = xFrequency;
-        _yFrequency = yFrequency;
+        Speed = speed;
+        Seed = seed;
+        Magnitude = magnitude;
+        Offset = offset;
     }
 
-    public override void Update(Node node, float delta)
+    protected Wiggler(Vector2 speed, Vector2 seed, Vector2 magnitude, Vector2 offset)
     {
-        var oldPos = node.Position;
-        var newY = oldPos.Y + MathF.Sin((_frame/1000f) * _yFrequency) * _yAmplitude;
-        var newX = oldPos.X + MathF.Sin((_frame/1000f) * _xFrequency) * _xAmplitude;
-        node.Position = new Vector2(newX, newY);
-        _frame++;
-    }
-    
-    public static float PingPong(float val, float length)
-    {
-        return MathF.Abs((float) ((val + (double) length) % (length * 2.0)) - length);
+        Speed = new Vector3(speed, 0);
+        Seed = new Vector3(seed, 0);
+        Magnitude = new Vector3(magnitude, 0);
+        Offset = new Vector3(offset, 0);
     }
 
+    protected Vector3 Wiggle()
+    {
+        var tick = Environment.TickCount64 / 10000f;
+        return Offset + new Vector3
+        {
+            X = (Noise.Generate(tick * Speed.X + Seed.X) * 2 - 1) * Magnitude.X,
+            Y = (Noise.Generate(tick * Speed.Y + Seed.Y) * 2 - 1) * Magnitude.Y,
+            Z = (Noise.Generate(tick * Speed.Z + Seed.Z) * 2 - 1) * Magnitude.Z
+        };
+    }
 }

@@ -6,7 +6,7 @@ namespace ProtoDisplayDriver.Components;
 
 public class ImageRenderer : Component
 {
-    private Image<Rgba32> _image;
+    protected Image<Rgba32> _image;
 
     public ImageRenderer(Image<Rgba32> image)
     {
