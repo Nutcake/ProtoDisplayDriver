@@ -46,7 +46,7 @@ namespace ProtoDisplayDriver
             
             faceHolder.AddChild(eyeNode);
             faceHolder.AddChild(mouthNode);
-                        
+            
             virtualCanvas.AddNode(faceHolder);
             virtualCanvas.AddNode(eyeNode);
             virtualCanvas.AddNode(mouthNode);

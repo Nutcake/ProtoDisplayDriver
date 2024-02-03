@@ -29,7 +29,7 @@ public class ImageRenderer : Component
             {
                 var pixel = _image[imgX, imgY];
                 if (pixel.A < 1) continue;
-
+                var pixVal = pixel.A / 255f;
                 var (tfX, tfY) = Vector2.Transform(
                     new Vector2((imgX - pivot.X) * node.GlobalScale.X - (_image.Width - 1) / 2f, (imgY - pivot.Y) * node.GlobalScale.Y - (_image.Height - 1) / 2f), mat);
                 var xFloor = (int)float.Floor(tfX);
@@ -47,13 +47,13 @@ public class ImageRenderer : Component
                 var deltaYHigh = 1 - (yCeil - tfY);
 
                 var ff = float.Clamp(canvas[xFloor, yFloor] + (deltaXLow + deltaYLow) / 4, 0, 1);
-                canvas[xFloor, yFloor] = ff;
+                canvas[xFloor, yFloor] = ff * pixVal;
                 var cf = float.Clamp(canvas[xCeil, yFloor] + (deltaXHigh + deltaYLow) / 4, 0, 1);
-                canvas[xCeil, yFloor] = cf;
+                canvas[xCeil, yFloor] = cf * pixVal;
                 var cc = float.Clamp(canvas[xCeil, yCeil] + (deltaXHigh + deltaYHigh) / 4, 0, 1);
-                canvas[xCeil, yCeil] = cc;
+                canvas[xCeil, yCeil] = cc * pixVal;
                 var fc = float.Clamp(canvas[xFloor, yCeil] + (deltaXLow + deltaYHigh) / 4, 0, 1);
-                canvas[xFloor, yCeil] = fc;
+                canvas[xFloor, yCeil] = fc * pixVal;
             }
         }
     }
