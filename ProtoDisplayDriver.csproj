@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework> 
         <RuntimeIdentifiers>win-x64;linux-arm64</RuntimeIdentifiers>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -13,9 +13,9 @@
         <HintPath>..\rpi-rgb-led-matrix\bindings\c#\bin\Release\net6.0\RPiRgbLEDMatrix.dll</HintPath>
       </Reference>
     </ItemGroup>
-
     <ItemGroup>
       <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+      <PackageReference Include="PortAudioSharp2" Version="0.4.0" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2" />
     </ItemGroup>
 

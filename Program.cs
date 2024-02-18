@@ -6,11 +6,21 @@ using Timer = System.Timers.Timer;
 
 namespace ProtoDisplayDriver
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] _)
+        private static void Main(string[] _)
         {
-            using var matrix = new RGBLedMatrix(32, 2, 1);
+            using var matrix = new RGBLedMatrix(new RGBLedMatrixOptions
+            {
+                Parallel = 2,
+                Rows = 64,
+                Cols = 64
+            });
+            Scene(matrix);
+        }
+
+        static void Scene(RGBLedMatrix matrix)
+        {
             var random = new Random();
             var world = new World(matrix);
 
@@ -25,7 +35,6 @@ namespace ProtoDisplayDriver
             var spiralEyeNode = new Node(new Vector2(10, 1), scale: new Vector2(0.8f, 0.8f));
             spiralEyeNode.AddComponent(new ImageRenderer("./res/EyeSpiral.png"));
             spiralEyeNode.AddComponent(new Rotator(new Vector3(0, 0, -0.2f)));
-
             var happyEyeNode = new Node(new Vector2(5, 2), scale: new Vector2(0.7f, 0.7f), rotation: new Vector3(0, 0, 0.1f));
             happyEyeNode.AddComponent(new ImageRenderer("./res/EyeHappy.png"));
 
@@ -51,8 +60,19 @@ namespace ProtoDisplayDriver
             var eyeHolder = new Node();
             eyeHolder.AddComponent(multiplexer);
 
-            var mouthNode = new Node(new Vector2(28f, 22f), rotation: new Vector3(0, 0, 0.05f));
-            mouthNode.AddComponent(new ImageRenderer("./res/Mouth.png"));
+            var closedMouthNode = new Node();
+            closedMouthNode.AddComponent(new ImageRenderer("./res/Mouth.png"));
+
+            var openMouthNode = new Node();
+            openMouthNode.AddComponent(new ImageRenderer("./res/Box.png"));
+
+            var mouthNode = new Node(new Vector2(28f, 37), rotation: new Vector3(0, 0, 0.05f));
+            mouthNode.AddComponent(new LipSyncChildMultiplexer(new Dictionary<Viseme, Node>()
+            {
+                { Viseme.None, closedMouthNode },
+                { Viseme.Aa, openMouthNode }
+            }));
+
 
             var eyeTimer = new Timer(5000);
             eyeTimer.Elapsed += (_, _) => world.ScheduleExecuteNextUpdate(() => multiplexer.Index = (multiplexer.Index + 1) % multiplexer.NodeCount);
@@ -64,6 +84,9 @@ namespace ProtoDisplayDriver
             faceHolder.AddChild(mouthNode);
 
             world.AddChild(faceHolder);
+            //var nose = new Node(position: new Vector2(60, -12));
+            //nose.AddComponent(new ImageRenderer("./res/Box.png"));
+            //world.AddChild(nose);
             world.Loop();
         }
     }

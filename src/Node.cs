@@ -8,7 +8,7 @@ public class Node
     public Vector3 Rotation { get; set; }
     public Vector2 Scale { get; set; }
 
-    public Node? Parent { get; set; }
+    public Node? Parent { get; private set; }
 
     private readonly HashSet<Node> _children = new();
 
