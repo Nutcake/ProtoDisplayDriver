@@ -1,37 +1,42 @@
 ﻿using Microsoft.Xna.Framework;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Color = RPiRgbLEDMatrix.Color;
 
 namespace ProtoDisplayDriver.Components;
 
 public class ImageRenderer : Component
 {
-    protected Image<Rgba32> _image;
+    protected Image<Rgba32> Image;
 
     public ImageRenderer(Image<Rgba32> image)
     {
-        _image = image;
+        Image = image;
     }
 
-    public ImageRenderer(string path) : this(Image.Load<Rgba32>(path))
+    public ImageRenderer(string path) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(path))
     {
     }
 
-
-    public override void Draw(float[,] canvas, int width, int height, float delta)
+    public override void Draw(Color[,] canvas, int width, int height, float delta)
     {
-        var pivot = new PointF(_image.Width / 2f, _image.Height / 2f);
+        var pivot = new PointF(Image.Width / 2f, Image.Height / 2f);
         var mat = Matrix.CreateFromYawPitchRoll(Node.GlobalRotation.X, Node.GlobalRotation.Y, Node.GlobalRotation.Z);
         mat.Translation = new Vector3(Node.GlobalPosition.X + pivot.X, Node.GlobalPosition.Y + pivot.Y, 0);
-        for (var imgY = 0; imgY < _image.Height; imgY++)
+        for (var imgY = 0; imgY < Image.Height; imgY++)
         {
-            for (var imgX = 0; imgX < _image.Width; imgX++)
+            for (var imgX = 0; imgX < Image.Width; imgX++)
             {
-                var pixel = _image[imgX, imgY];
+                var pixel = Image[imgX, imgY];
                 if (pixel.A < 1) continue;
-                var pixVal = pixel.A / 255f;
+
+                var pixCol = new Color(pixel.R, pixel.G, pixel.B).Multiply(pixel.A / 255f);
+
+                // Transform the pixel position according to node transformation
                 var (tfX, tfY) = Vector2.Transform(
                     new Vector2(imgX - pivot.X, imgY - pivot.Y), mat) * Node.GlobalScale;
+
+                // Do not draw if the pixel is outside the canvas
                 var xFloor = (int)float.Floor(tfX);
                 var xCeil = (int)float.Ceiling(tfX);
                 var yFloor = (int)float.Floor(tfY);
@@ -41,19 +46,31 @@ public class ImageRenderer : Component
                     yFloor < 0 || yFloor >= height ||
                     yCeil < 0 || yCeil >= height) continue;
 
+                // Calculate how much this image pixel covers the nearest 4 integer coordinates of the canvas
                 var deltaXLow = 1 - (tfX - xFloor);
                 var deltaYLow = 1 - (tfY - yFloor);
                 var deltaXHigh = 1 - (xCeil - tfX);
                 var deltaYHigh = 1 - (yCeil - tfY);
 
-                var ff = float.Clamp(canvas[xFloor, yFloor] + (deltaXLow + deltaYLow) / 4, 0, 1);
-                canvas[xFloor, yFloor] = ff * pixVal;
-                var cf = float.Clamp(canvas[xCeil, yFloor] + (deltaXHigh + deltaYLow) / 4, 0, 1);
-                canvas[xCeil, yFloor] = cf * pixVal;
-                var cc = float.Clamp(canvas[xCeil, yCeil] + (deltaXHigh + deltaYHigh) / 4, 0, 1);
-                canvas[xCeil, yCeil] = cc * pixVal;
-                var fc = float.Clamp(canvas[xFloor, yCeil] + (deltaXLow + deltaYHigh) / 4, 0, 1);
-                canvas[xFloor, yCeil] = fc * pixVal;
+                // Add the image color to the affected pixels based on the amount of coverage
+                var ff = canvas[xFloor, yFloor].Add(pixCol.Multiply((deltaXLow + deltaYLow) / 4));
+                canvas[xFloor, yFloor] = ff;
+                var cf = canvas[xCeil, yFloor].Add(pixCol.Multiply((deltaXHigh + deltaYLow) / 4));
+                canvas[xCeil, yFloor] = cf;
+                var cc = canvas[xCeil, yCeil].Add(pixCol.Multiply((deltaXHigh + deltaYHigh) / 4));
+                canvas[xCeil, yCeil] = cc;
+                var fc = canvas[xFloor, yCeil].Add(pixCol.Multiply((deltaXLow + deltaYHigh) / 4));
+                canvas[xFloor, yCeil] = fc;
+
+                bool IsRed(Color c)
+                {
+                    return c is { R: > 100, G: < 50, B: < 50 };
+                }
+
+                if (IsRed(fc) || IsRed(ff) || IsRed(cf) || IsRed(cc))
+                {
+                    continue;
+                }
             }
         }
     }

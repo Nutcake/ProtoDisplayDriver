@@ -1,23 +1,28 @@
-﻿using ExtensionMethods;
-using RPiRgbLEDMatrix;
+﻿using RPiRgbLEDMatrix;
 
 namespace ProtoDisplayDriver;
 
 class World
 {
-    private static readonly Color Color = new(255, 100, 0);
+    private const float FrameTime = 22.22f;
     private bool _running = true;
     private readonly RGBLedCanvas _canvas;
     private readonly RGBLedMatrix _matrix;
     private long _lastElapsed;
     private readonly Node _rootNode = new();
     private Action? _updateRun;
+    private List<Component> _shaders = new();
 
     public World(RGBLedMatrix matrix)
     {
         _canvas = matrix.CreateOffscreenCanvas();
         Console.WriteLine($"Width: {_canvas.Width}, Height: {_canvas.Height}");
         _matrix = matrix;
+    }
+
+    public void AddShader(Component shader)
+    {
+        _shaders.Add(shader);
     }
 
     public void ScheduleExecuteNextUpdate(Action runnable)
@@ -45,9 +50,14 @@ class World
     private void Draw(float delta)
     {
         _canvas.Clear();
-        var values = new float[_canvas.Width, _canvas.Height / 2];
+        var values = new Color[_canvas.Width, _canvas.Height / 2];
 
         _rootNode.Draw(values, _canvas.Width, _canvas.Height / 2, delta);
+
+        foreach (var shader in _shaders)
+        {
+            shader.Draw(values, _canvas.Width, _canvas.Height / 2, delta);
+        }
 
         var colors = new Color[values.Length];
         var index = 0;
@@ -55,7 +65,7 @@ class World
         {
             for (var x = 0; x < _canvas.Width; x++)
             {
-                colors[index] = Color.Multiply(values[x, y]);
+                colors[index] = values[x, y];
                 index++;
             }
         }
@@ -65,7 +75,7 @@ class World
         {
             for (var x = 0; x < _canvas.Width; x++)
             {
-                _canvas.SetPixel(_canvas.Width - 1 - x, y, Color.Multiply(values[_canvas.Width - x - 1, _canvas.Height / 2 - y - 1]));
+                _canvas.SetPixel(_canvas.Width - 1 - x, y, values[_canvas.Width - x - 1, _canvas.Height / 2 - y - 1]);
             }
         }
 
@@ -80,7 +90,7 @@ class World
             Update(_lastElapsed / 1000f);
             Draw(_lastElapsed / 1000f);
             _lastElapsed = Environment.TickCount64 - frameStart;
-            if (_lastElapsed < 33) Thread.Sleep(33 - (int)_lastElapsed);
+            if (_lastElapsed < FrameTime) Thread.Sleep((int)FrameTime - (int)_lastElapsed);
         }
     }
 

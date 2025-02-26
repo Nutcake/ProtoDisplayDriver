@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using ProtoDisplayDriver.Components;
 using RPiRgbLEDMatrix;
 using Color = RPiRgbLEDMatrix.Color;
@@ -10,6 +11,14 @@ namespace ProtoDisplayDriver
     {
         private static void Main(string[] _)
         {
+            Console.WriteLine("Waiting for debugger to attach");
+            while (Debugger.IsAttached)
+            {
+                Thread.Sleep(100);
+            }
+
+            Console.WriteLine("Debugger attached");
+
             using var matrix = new RGBLedMatrix(new RGBLedMatrixOptions
             {
                 Parallel = 2,
@@ -97,23 +106,8 @@ namespace ProtoDisplayDriver
             var nose = new Node(position: new Vector2(60, -12));
             nose.AddComponent(new ImageRenderer("./res/Box.png"));
             world.AddChild(nose);
+            world.AddShader(new ColorWaveShader(30));
             world.Loop();
-        }
-    }
-}
-
-namespace ExtensionMethods
-{
-    public static class Extensions
-    {
-        public static Color Multiply(this Color a, float factor)
-        {
-            return new Color
-            {
-                R = (byte)(a.R * factor),
-                G = (byte)(a.G * factor),
-                B = (byte)(a.B * factor)
-            };
         }
     }
 }

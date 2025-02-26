@@ -1,4 +1,6 @@
-﻿namespace ProtoDisplayDriver;
+﻿using Microsoft.Xna.Framework;
+
+namespace ProtoDisplayDriver;
 
 public abstract class Component
 {
@@ -23,12 +25,11 @@ public abstract class Component
     {
     }
 
-    public virtual void Draw(float[,] canvas, int width, int height, float delta)
+    public virtual void Draw(RPiRgbLEDMatrix.Color[,] canvas, int width, int height, float delta)
     {
     }
-    
+
     public virtual void OnAttach()
     {
-        
     }
 }

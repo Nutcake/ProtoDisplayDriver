@@ -22,7 +22,7 @@ public class AnimatedImageRenderer : ImageRenderer
         _pingPong = pingPong;
     }
 
-    public AnimatedImageRenderer(IEnumerable<string> framePaths, float speed = 1, bool pingPong = false) : this(framePaths.Select(Image.Load<Rgba32>).ToList(), speed, pingPong)
+    public AnimatedImageRenderer(IEnumerable<string> framePaths, float speed = 1, bool pingPong = false) : this(framePaths.Select(SixLabors.ImageSharp.Image.Load<Rgba32>).ToList(), speed, pingPong)
     {
     }
 
@@ -56,9 +56,9 @@ public class AnimatedImageRenderer : ImageRenderer
         PlaybackFinished?.Invoke();
     }
 
-    public override void Draw(float[,] canvas, int width, int height, float delta)
+    public override void Draw(RPiRgbLEDMatrix.Color[,] canvas, int width, int height, float delta)
     {
-        _image = _frames[(int)float.Floor(_frameIdx)];
+        Image = _frames[(int)float.Floor(_frameIdx)];
         base.Draw(canvas, width, height, delta);
         if (!_playing) return;
         _frameIdx = _isPong && _pingPong ? _frameIdx - _speed : _frameIdx + _speed;
