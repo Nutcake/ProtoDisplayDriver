@@ -13,7 +13,7 @@ namespace ProtoDisplayDriver
             using var matrix = new RGBLedMatrix(new RGBLedMatrixOptions
             {
                 Parallel = 2,
-                Rows = 64,
+                Rows = 32,
                 Cols = 64
             });
             Scene(matrix);
@@ -31,14 +31,14 @@ namespace ProtoDisplayDriver
                     new Vector2(1f, 1f),
                     new Vector2(0, 0)
                 ));
-
-            var spiralEyeNode = new Node(new Vector2(10, 1), scale: new Vector2(0.8f, 0.8f));
+            /*
+            var spiralEyeNode = new Node(new Vector2(18, 1), scale: new Vector2(0.8f, 0.8f));
             spiralEyeNode.AddComponent(new ImageRenderer("./res/EyeSpiral.png"));
             spiralEyeNode.AddComponent(new Rotator(new Vector3(0, 0, -0.2f)));
-            var happyEyeNode = new Node(new Vector2(5, 2), scale: new Vector2(0.7f, 0.7f), rotation: new Vector3(0, 0, 0.1f));
+            var happyEyeNode = new Node(new Vector2(14, 2), scale: new Vector2(0.7f, 0.7f), rotation: new Vector3(0, 0, 0.1f));
             happyEyeNode.AddComponent(new ImageRenderer("./res/EyeHappy.png"));
-
-            var normalEyeNode = new Node(position: new Vector2(5, 2), new Vector3(0, 0, 0.1f), scale: new Vector2(0.8f, 1.0f));
+            */
+            var normalEyeNode = new Node(position: new Vector2(14, 2), new Vector3(0, 0, 0.1f), scale: new Vector2(0.8f, 1.0f));
             var eyeRenderer = new AnimatedImageRenderer("./res/EyeFrames/", speed: 3f, pingPong: true);
             normalEyeNode.AddComponent(eyeRenderer);
             var blinkTimer = new Timer(2000);
@@ -50,7 +50,7 @@ namespace ProtoDisplayDriver
             blinkTimer.Elapsed += (_, _) => { world.ScheduleExecuteNextUpdate(eyeRenderer.PlayOneshot); };
             blinkTimer.AutoReset = false;
             blinkTimer.Enabled = true;
-
+            /*
             var multiplexer = new ChildMultiplexer(new List<Node>
             {
                 normalEyeNode,
@@ -59,6 +59,7 @@ namespace ProtoDisplayDriver
             });
             var eyeHolder = new Node();
             eyeHolder.AddComponent(multiplexer);
+            */
 
             var closedMouthNode = new Node();
             closedMouthNode.AddComponent(new ImageRenderer("./res/Mouth.png"));
@@ -66,27 +67,36 @@ namespace ProtoDisplayDriver
             var openMouthNode = new Node();
             openMouthNode.AddComponent(new ImageRenderer("./res/Box.png"));
 
-            var mouthNode = new Node(new Vector2(28f, 37), rotation: new Vector3(0, 0, 0.05f));
-            mouthNode.AddComponent(new LipSyncChildMultiplexer(new Dictionary<Viseme, Node>()
+            var mouthNode = new Node(new Vector2(32f, 21), rotation: new Vector3(0, 0, 0.05f));
+            mouthNode.AddComponent(new LipSyncChildMultiplexer(new Dictionary<Viseme, Node>
             {
                 { Viseme.None, closedMouthNode },
                 { Viseme.Aa, openMouthNode }
             }));
 
-
+            /*
             var eyeTimer = new Timer(5000);
             eyeTimer.Elapsed += (_, _) => world.ScheduleExecuteNextUpdate(() => multiplexer.Index = (multiplexer.Index + 1) % multiplexer.NodeCount);
             eyeTimer.AutoReset = true;
             eyeTimer.Enabled = true;
+            */
 
+            //var noseNode = new Node(new Vector2(55, 15));
+            //noseNode.AddComponent(new ImageRenderer("./res/Circle8.png"));
 
-            faceHolder.AddChild(eyeHolder);
+            faceHolder.AddChild(normalEyeNode);
             faceHolder.AddChild(mouthNode);
+            //faceHolder.AddChild(noseNode);
 
             world.AddChild(faceHolder);
-            //var nose = new Node(position: new Vector2(60, -12));
-            //nose.AddComponent(new ImageRenderer("./res/Box.png"));
-            //world.AddChild(nose);
+
+            var sideIlluminator = new Node(new Vector2(-8, 16), scale: new Vector2(1f, 1f));
+            sideIlluminator.AddComponent(new ImageRenderer("./res/Circle32.png"));
+            world.AddChild(sideIlluminator);
+
+            var nose = new Node(position: new Vector2(60, -12));
+            nose.AddComponent(new ImageRenderer("./res/Box.png"));
+            world.AddChild(nose);
             world.Loop();
         }
     }

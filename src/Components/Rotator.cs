@@ -13,6 +13,6 @@ public class Rotator : Component
 
     public override void Update(float delta)
     {
-        Node.Rotation = Node.Rotation + _speed;
+        Node.Rotation += _speed;
     }
 }

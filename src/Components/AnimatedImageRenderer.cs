@@ -5,11 +5,11 @@ namespace ProtoDisplayDriver.Components;
 
 public class AnimatedImageRenderer : ImageRenderer
 {
-    private float _speed;
-    private bool _pingPong;
-    private bool isPong;
+    private readonly float _speed;
+    private readonly bool _pingPong;
+    private bool _isPong;
     private float _frameIdx;
-    private List<Image<Rgba32>> _frames;
+    private readonly List<Image<Rgba32>> _frames;
     private bool _playing;
     private bool _stopAfterPlay;
 
@@ -61,11 +61,11 @@ public class AnimatedImageRenderer : ImageRenderer
         _image = _frames[(int)float.Floor(_frameIdx)];
         base.Draw(canvas, width, height, delta);
         if (!_playing) return;
-        _frameIdx = isPong && _pingPong ? _frameIdx - _speed : _frameIdx + _speed;
+        _frameIdx = _isPong && _pingPong ? _frameIdx - _speed : _frameIdx + _speed;
         if (_frameIdx >= _frames.Count)
         {
             _frameIdx = _frames.Count - 1;
-            isPong = true;
+            _isPong = true;
             if (!_pingPong)
             {
                 _frameIdx = 0;
@@ -80,7 +80,7 @@ public class AnimatedImageRenderer : ImageRenderer
         if (_frameIdx < 0)
         {
             _frameIdx = 0;
-            isPong = false;
+            _isPong = false;
             if (_stopAfterPlay)
             {
                 _playing = false;

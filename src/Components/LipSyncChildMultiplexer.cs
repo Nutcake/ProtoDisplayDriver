@@ -1,4 +1,4 @@
-﻿using PortAudioSharp;
+﻿
 namespace ProtoDisplayDriver.Components;
 
 public enum Viseme
@@ -9,49 +9,62 @@ public enum Viseme
 
 public class LipSyncChildMultiplexer : ChildMultiplexer
 {
+    private const int SampleRate = 44100;
+    private const int DeviceIndex = 0;
     private readonly Dictionary<Viseme, int> _nodeMap;
-    private short[] _recording = new short[2000];
-    private int samplesAvailable;
-
+    private float[] _recording = new float[1024];
+    private int _samplesAvailable;
+        
     public LipSyncChildMultiplexer(Dictionary<Viseme, Node> visemes) : base(visemes.Values.ToList())
     {
+        /*
         _nodeMap = visemes.Keys.Select((viseme, i) => new { Key = viseme, Value = i }).ToDictionary(pair => pair.Key, pair => pair.Value);
 
         PortAudio.Initialize();
-        Console.WriteLine($"Number of devices: {PortAudio.DeviceCount}");
-        for (int i = 0; i != PortAudio.DeviceCount; ++i)
-        {
-            Console.WriteLine($" Device {i}");
-            DeviceInfo deviceInfo = PortAudio.GetDeviceInfo(i);
-            Console.WriteLine($"   Name: {deviceInfo.name}");
-            Console.WriteLine($"   Max input channels: {deviceInfo.maxInputChannels}");
-            Console.WriteLine($"   Default sample rate: {deviceInfo.defaultSampleRate}");
-        }
-        int deviceIndex = PortAudio.DefaultInputDevice;
-        if (deviceIndex == PortAudio.NoDevice)
-        {
-            Console.WriteLine("No default input device found");
-            Environment.Exit(1);
-        }
 
-        DeviceInfo info = PortAudio.GetDeviceInfo(deviceIndex);
+        DeviceInfo info = PortAudio.GetDeviceInfo(DeviceIndex);
 
         Console.WriteLine();
-        Console.WriteLine($"Use default device {deviceIndex} ({info.name})");
-
+        Console.WriteLine($"Using device {DeviceIndex} ({info.name})");
         
-       var audioInputThread = new Thread(ReadAudioInput);
-       audioInputThread.Start();
+        var param = new StreamParameters
+        {
+            device = DeviceIndex,
+            channelCount = 1,
+            sampleFormat = SampleFormat.Float32,
+            suggestedLatency = info.defaultLowInputLatency,
+            hostApiSpecificStreamInfo = IntPtr.Zero,
+        };
+
+        StreamCallbackResult Callback(IntPtr input, IntPtr output, uint frameCount, ref StreamCallbackTimeInfo timeInfo, StreamCallbackFlags statusFlags, IntPtr userData)
+        {
+            _samplesAvailable = (int)frameCount;
+            Marshal.Copy(input, _recording, 0, 1024);
+
+            return StreamCallbackResult.Continue;
+        }
+
+        var stream = new PortAudioSharp.Stream(inParams: param, outParams: null, sampleRate: SampleRate,
+            framesPerBuffer: 0,
+            streamFlags: StreamFlags.ClipOff,
+            callback: Callback,
+            userData: IntPtr.Zero
+        );
+
+        Console.WriteLine(param);
+        Console.WriteLine("Started! Please speak");
+
+        stream.Start();
+        */
     }
 
     private void ReadAudioInput()
     {
-        
     }
 
     public override void Update(float delta)
     {
-        if (samplesAvailable > 0)
-            Console.WriteLine(_recording[..samplesAvailable].Select(x => Math.Abs(x - 128)).Max() * 80 / 128);
+        if (_samplesAvailable > 0)
+            Console.WriteLine(_recording[.._samplesAvailable].Max());
     }
 }

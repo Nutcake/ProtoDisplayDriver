@@ -65,7 +65,7 @@ class World
         {
             for (var x = 0; x < _canvas.Width; x++)
             {
-                _canvas.SetPixel(_canvas.Width-1-x, y, Color.Multiply(values[x, y]));
+                _canvas.SetPixel(_canvas.Width - 1 - x, y, Color.Multiply(values[_canvas.Width - x - 1, _canvas.Height / 2 - y - 1]));
             }
         }
 
