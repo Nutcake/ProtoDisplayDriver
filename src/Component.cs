@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-
-namespace ProtoDisplayDriver;
+﻿namespace ProtoDisplayDriver;
 
 public abstract class Component
 {

@@ -38,8 +38,15 @@ namespace ProtoDisplayDriver
                 new PositionWiggler(
                     new Vector2(2f, 2f),
                     new Vector2(1f, 1f),
-                    new Vector2(0, 0)
+                    Vector2.Zero
                 ));
+            var staticFace = new Node();
+            staticFace.AddComponent(
+                new PositionWiggler(
+                    new Vector2(0.1f, 0.1f),
+                    new Vector2(0.1f, 0.1f), Vector2.Zero
+                ));
+
             /*
             var spiralEyeNode = new Node(new Vector2(18, 1), scale: new Vector2(0.8f, 0.8f));
             spiralEyeNode.AddComponent(new ImageRenderer("./res/EyeSpiral.png"));
@@ -48,7 +55,7 @@ namespace ProtoDisplayDriver
             happyEyeNode.AddComponent(new ImageRenderer("./res/EyeHappy.png"));
             */
             var normalEyeNode = new Node(position: new Vector2(14, 2), new Vector3(0, 0, 0.1f), scale: new Vector2(0.8f, 1.0f));
-            var eyeRenderer = new AnimatedImageRenderer("./res/EyeFrames/", speed: 3f, pingPong: true);
+            var eyeRenderer = new AnimatedImageRenderer("./res/EyeFrames/", speed: 3f, pingPong: true, color: new Color(255, 80, 0));
             normalEyeNode.AddComponent(eyeRenderer);
             var blinkTimer = new Timer(2000);
             eyeRenderer.PlaybackFinished += () =>
@@ -71,10 +78,10 @@ namespace ProtoDisplayDriver
             */
 
             var closedMouthNode = new Node();
-            closedMouthNode.AddComponent(new ImageRenderer("./res/Mouth.png"));
+            closedMouthNode.AddComponent(new ImageRenderer("./res/Mouth.png", color: new Color(255, 80, 0)));
 
             var openMouthNode = new Node();
-            openMouthNode.AddComponent(new ImageRenderer("./res/Box.png"));
+            openMouthNode.AddComponent(new ImageRenderer("./res/Box.png", color: new Color(255, 80, 0)));
 
             var mouthNode = new Node(new Vector2(32f, 21), rotation: new Vector3(0, 0, 0.05f));
             mouthNode.AddComponent(new LipSyncChildMultiplexer(new Dictionary<Viseme, Node>
@@ -90,23 +97,21 @@ namespace ProtoDisplayDriver
             eyeTimer.Enabled = true;
             */
 
-            //var noseNode = new Node(new Vector2(55, 15));
-            //noseNode.AddComponent(new ImageRenderer("./res/Circle8.png"));
-
             faceHolder.AddChild(normalEyeNode);
             faceHolder.AddChild(mouthNode);
-            //faceHolder.AddChild(noseNode);
-
-            world.AddChild(faceHolder);
 
             var sideIlluminator = new Node(new Vector2(-8, 16), scale: new Vector2(1f, 1f));
-            sideIlluminator.AddComponent(new ImageRenderer("./res/Circle32.png"));
-            world.AddChild(sideIlluminator);
+            sideIlluminator.AddComponent(new ImageRenderer("./res/Circle32.png", color: new Color(255, 80, 0)));
 
-            var nose = new Node(position: new Vector2(60, -12));
-            nose.AddComponent(new ImageRenderer("./res/Box.png"));
-            world.AddChild(nose);
-            world.AddShader(new ColorWaveShader(30));
+            var nose = new Node(position: new Vector2(58, -4));
+            nose.AddComponent(new ImageRenderer("./res/Circle8.png", color: new Color(255, 80, 0)));
+
+            staticFace.AddChild(nose);
+            staticFace.AddChild(sideIlluminator);
+
+            world.AddChild(faceHolder);
+            world.AddChild(staticFace);
+            //world.AddShader(new ColorWaveShader(30));
             world.Loop();
         }
     }

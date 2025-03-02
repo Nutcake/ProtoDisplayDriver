@@ -1,5 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Color = RPiRgbLEDMatrix.Color;
 
 namespace ProtoDisplayDriver.Components;
 
@@ -15,18 +16,18 @@ public class AnimatedImageRenderer : ImageRenderer
 
     public Action? PlaybackFinished;
 
-    public AnimatedImageRenderer(List<Image<Rgba32>> frames, float speed = 1, bool pingPong = false) : base(frames.First())
+    private AnimatedImageRenderer(List<Image<Rgba32>> frames, float speed = 1, bool pingPong = false, Color? color = null) : base(frames.First(), color: color)
     {
         _speed = speed;
         _frames = frames;
         _pingPong = pingPong;
     }
 
-    public AnimatedImageRenderer(IEnumerable<string> framePaths, float speed = 1, bool pingPong = false) : this(framePaths.Select(SixLabors.ImageSharp.Image.Load<Rgba32>).ToList(), speed, pingPong)
+    private AnimatedImageRenderer(IEnumerable<string> framePaths, float speed = 1, bool pingPong = false, Color? color = null) : this(framePaths.Select(SixLabors.ImageSharp.Image.Load<Rgba32>).ToList(), speed, pingPong, color: color)
     {
     }
 
-    public AnimatedImageRenderer(string framesDir, float speed = 1, bool pingPong = false) : this(Directory.GetFiles(framesDir).OrderBy(p => p), speed, pingPong)
+    public AnimatedImageRenderer(string framesDir, float speed = 1, bool pingPong = false, Color? color = null) : this(Directory.GetFiles(framesDir).OrderBy(p => p), speed, pingPong, color: color)
     {
     }
 
@@ -56,7 +57,7 @@ public class AnimatedImageRenderer : ImageRenderer
         PlaybackFinished?.Invoke();
     }
 
-    public override void Draw(RPiRgbLEDMatrix.Color[,] canvas, int width, int height, float delta)
+    public override void Draw(Color[,] canvas, int width, int height, float delta)
     {
         Image = _frames[(int)float.Floor(_frameIdx)];
         base.Draw(canvas, width, height, delta);

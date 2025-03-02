@@ -770,14 +770,5 @@ namespace ProtoDisplayDriver
       float num3 = num1 < 4 ? y : (num1 == 12 || num1 == 14 ? x : z);
       return (float) (((num1 & 1) != 0 ? -(double) num2 : num2) + ((num1 & 2) != 0 ? -(double) num3 : num3));
     }
-
-    private static float Grad(int hash, float x, float y, float z, float t)
-    {
-      int num1 = hash & 31;
-      float num2 = num1 < 24 ? x : y;
-      float num3 = num1 < 16 ? y : z;
-      float num4 = num1 < 8 ? z : t;
-      return (float) (((num1 & 1) != 0 ? -(double) num2 : num2) + ((num1 & 2) != 0 ? -(double) num3 : num3) + ((num1 & 4) != 0 ? -(double) num4 : num4));
-    }
   }
 }

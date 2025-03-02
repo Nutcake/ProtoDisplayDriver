@@ -8,13 +8,15 @@ namespace ProtoDisplayDriver.Components;
 public class ImageRenderer : Component
 {
     protected Image<Rgba32> Image;
+    private Color _color;
 
-    public ImageRenderer(Image<Rgba32> image)
+    public ImageRenderer(Image<Rgba32> image, Color? color = null)
     {
         Image = image;
+        _color = color ?? new Color(255, 255, 255);
     }
 
-    public ImageRenderer(string path) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(path))
+    public ImageRenderer(string path, Color? color = null) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(path), color)
     {
     }
 
@@ -30,7 +32,7 @@ public class ImageRenderer : Component
                 var pixel = Image[imgX, imgY];
                 if (pixel.A < 1) continue;
 
-                var pixCol = new Color(pixel.R, pixel.G, pixel.B).Multiply(pixel.A / 255f);
+                var pixCol = new Color(pixel.R, pixel.G, pixel.B).Multiply(pixel.A / 255f).Multiply(_color);
 
                 // Transform the pixel position according to node transformation
                 var (tfX, tfY) = Vector2.Transform(
@@ -61,16 +63,6 @@ public class ImageRenderer : Component
                 canvas[xCeil, yCeil] = cc;
                 var fc = canvas[xFloor, yCeil].Add(pixCol.Multiply((deltaXLow + deltaYHigh) / 4));
                 canvas[xFloor, yCeil] = fc;
-
-                bool IsRed(Color c)
-                {
-                    return c is { R: > 100, G: < 50, B: < 50 };
-                }
-
-                if (IsRed(fc) || IsRed(ff) || IsRed(cf) || IsRed(cc))
-                {
-                    continue;
-                }
             }
         }
     }

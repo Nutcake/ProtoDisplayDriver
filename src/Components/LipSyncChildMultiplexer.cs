@@ -1,4 +1,5 @@
-﻿
+﻿using Un4seen.Bass;
+
 namespace ProtoDisplayDriver.Components;
 
 public enum Viseme
@@ -14,57 +15,25 @@ public class LipSyncChildMultiplexer : ChildMultiplexer
     private readonly Dictionary<Viseme, int> _nodeMap;
     private float[] _recording = new float[1024];
     private int _samplesAvailable;
-        
+    private Stream _stream;
+
     public LipSyncChildMultiplexer(Dictionary<Viseme, Node> visemes) : base(visemes.Values.ToList())
     {
-        /*
         _nodeMap = visemes.Keys.Select((viseme, i) => new { Key = viseme, Value = i }).ToDictionary(pair => pair.Key, pair => pair.Value);
 
-        PortAudio.Initialize();
-
-        DeviceInfo info = PortAudio.GetDeviceInfo(DeviceIndex);
-
-        Console.WriteLine();
-        Console.WriteLine($"Using device {DeviceIndex} ({info.name})");
-        
-        var param = new StreamParameters
+        if (!Bass.BASS_Init(-1, 441000, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero))
         {
-            device = DeviceIndex,
-            channelCount = 1,
-            sampleFormat = SampleFormat.Float32,
-            suggestedLatency = info.defaultLowInputLatency,
-            hostApiSpecificStreamInfo = IntPtr.Zero,
-        };
-
-        StreamCallbackResult Callback(IntPtr input, IntPtr output, uint frameCount, ref StreamCallbackTimeInfo timeInfo, StreamCallbackFlags statusFlags, IntPtr userData)
-        {
-            _samplesAvailable = (int)frameCount;
-            Marshal.Copy(input, _recording, 0, 1024);
-
-            return StreamCallbackResult.Continue;
+            //throw new Exception($"Failed to init Bass.NET, ERR {Bass.BASS_ErrorGetCode()}");
         }
 
-        var stream = new PortAudioSharp.Stream(inParams: param, outParams: null, sampleRate: SampleRate,
-            framesPerBuffer: 0,
-            streamFlags: StreamFlags.ClipOff,
-            callback: Callback,
-            userData: IntPtr.Zero
-        );
-
-        Console.WriteLine(param);
-        Console.WriteLine("Started! Please speak");
-
-        stream.Start();
-        */
-    }
-
-    private void ReadAudioInput()
-    {
+        if (!Bass.BASS_RecordInit(-1))
+        {
+            //throw new Exception($"Failed to init Bass.NET Recording, ERR {Bass.BASS_ErrorGetCode()}");
+        }
     }
 
     public override void Update(float delta)
     {
-        if (_samplesAvailable > 0)
-            Console.WriteLine(_recording[.._samplesAvailable].Max());
+
     }
 }
