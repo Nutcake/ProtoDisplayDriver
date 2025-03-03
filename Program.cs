@@ -72,11 +72,7 @@ namespace ProtoDisplayDriver
             openMouthNode.AddComponent(new ImageRenderer("./res/Box.png", color: new Color(255, 80, 0)));
 
             var mouthNode = new Node(new Vector2(32f, 21), rotation: new Vector3(0, 0, 0.05f));
-            mouthNode.AddComponent(new LipSyncChildMultiplexer(new Dictionary<Viseme, Node>
-            {
-                { Viseme.None, closedMouthNode },
-                { Viseme.Aa, openMouthNode }
-            }));
+            mouthNode.AddComponent(new MouthFftDisplay());
 
             faceHolder.AddChild(normalEyeNode);
             faceHolder.AddChild(mouthNode);

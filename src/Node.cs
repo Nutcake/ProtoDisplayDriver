@@ -1,5 +1,5 @@
-﻿
-using System.Numerics;
+﻿using System.Numerics;
+using RPiRgbLEDMatrix;
 
 namespace ProtoDisplayDriver;
 
@@ -57,7 +57,7 @@ public class Node
         _components.Add(component);
     }
 
-    public void Draw(RPiRgbLEDMatrix.Color[,] canvas, int width, int height, float delta)
+    public void Draw(Color[,] canvas, int width, int height, float delta)
     {
         foreach (var component in _components)
         {
