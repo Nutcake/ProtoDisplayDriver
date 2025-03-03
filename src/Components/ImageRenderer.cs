@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Color = RPiRgbLEDMatrix.Color;
@@ -23,8 +23,8 @@ public class ImageRenderer : Component
     public override void Draw(Color[,] canvas, int width, int height, float delta)
     {
         var pivot = new PointF(Image.Width / 2f, Image.Height / 2f);
-        var mat = Matrix.CreateFromYawPitchRoll(Node.GlobalRotation.X, Node.GlobalRotation.Y, Node.GlobalRotation.Z);
-        mat.Translation = new Vector3(Node.GlobalPosition.X + pivot.X, Node.GlobalPosition.Y + pivot.Y, 0);
+        var mat4 = Matrix4x4.CreateFromYawPitchRoll(Node.GlobalRotation.X, Node.GlobalRotation.Y, Node.GlobalRotation.Z);
+        mat4.Translation = new Vector3(Node.GlobalPosition.X + pivot.X, Node.GlobalPosition.Y + pivot.Y, 0);
         for (var imgY = 0; imgY < Image.Height; imgY++)
         {
             for (var imgX = 0; imgX < Image.Width; imgX++)
@@ -35,9 +35,9 @@ public class ImageRenderer : Component
                 var pixCol = new Color(pixel.R, pixel.G, pixel.B).Multiply(pixel.A / 255f).Multiply(_color);
 
                 // Transform the pixel position according to node transformation
-                var (tfX, tfY) = Vector2.Transform(
-                    new Vector2(imgX - pivot.X, imgY - pivot.Y), mat) * Node.GlobalScale;
-
+                var tfV = Vector2.Transform(new Vector2(imgX - pivot.X, imgY - pivot.Y), mat4) * Node.GlobalScale;
+                var tfX = tfV.X;
+                var tfY = tfV.Y;
                 // Do not draw if the pixel is outside the canvas
                 var xFloor = (int)float.Floor(tfX);
                 var xCeil = (int)float.Ceiling(tfX);
